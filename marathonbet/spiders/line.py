@@ -3,7 +3,6 @@ from scrapy import Spider, Request
 from marathonbet.items import Match
 from urllib.parse import parse_qs
 from datetime import date, datetime, timezone, timedelta
-#from soccerway.competitions import competitions_id_list
 
 
 class LineSpider(Spider):
@@ -18,7 +17,7 @@ class LineSpider(Spider):
     def start_requests(self):
         for u in self.start_urls:
             request = Request(url=u, callback=self.parse_index)
-            #request.meta['proxy'] = 'http://127.0.0.1:8118'
+            request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
 
     def parse_index(self, response):
@@ -27,7 +26,7 @@ class LineSpider(Spider):
         links = [link for link in links if '/Football/' in link]
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_competition)
-            #request.meta['proxy'] = 'http://127.0.0.1:8118'
+            request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
 
     def parse_competition(self, response):
@@ -35,7 +34,7 @@ class LineSpider(Spider):
         links = response.xpath('//div[@class=" coupon-row"]/@data-event-page').extract()
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_match)
-            #request.meta['proxy'] = 'http://127.0.0.1:8118'
+            request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
 
     def parse_match(self, response):
@@ -45,4 +44,4 @@ class LineSpider(Spider):
             item['id'] = response.xpath('//div[@class=" coupon-row"]//@data-event-treeid').extract_first()
             item['data'] = l
             item['updated'] = datetime.utcnow().isoformat(' ')
-        yield item
+            yield item
