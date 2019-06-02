@@ -31,17 +31,17 @@ class LineSpider(Spider):
 
     def parse_competition(self, response):
         base_url = 'https://www.marathonbet.ru'
-        links = response.xpath('//div[@class=" coupon-row"]/@data-event-page').extract()
+        links = response.xpath('//div[@class="bg coupon-row"]/@data-event-page').extract()
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_match)
             request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
 
     def parse_match(self, response):
-        line = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
-        for l in line:
+        lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
+        for l in lines:
             item = Match()
-            item['id'] = response.xpath('//div[@class=" coupon-row"]//@data-event-treeid').extract_first()
+            item['id'] = response.xpath('//div[@class="bg coupon-row"]//@data-event-treeid').extract_first()
             item['data'] = l
             item['updated'] = datetime.utcnow().isoformat(' ')
             yield item
