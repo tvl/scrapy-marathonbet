@@ -11,7 +11,7 @@ class LineSpider(Spider):
     today  = date.today()
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
-            'https://www.marathonbet.ru'
+            'https://www.marathonbet.ru/su/'
         ]
 
     def start_requests(self):
@@ -22,7 +22,8 @@ class LineSpider(Spider):
 
     def parse_index(self, response):
         base_url = 'https://www.marathonbet.ru'
-        links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
+        #links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
+        links = response.xpath('//a[@class="category-label-link"]/@href').extract()
         links = [link for link in links if '/Football/' in link]
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_competition)
@@ -30,8 +31,8 @@ class LineSpider(Spider):
             yield request
 
     def parse_competition(self, response):
-        base_url = 'https://www.marathonbet.ru'
-        links = response.xpath('//div[@class="bg coupon-row"]/@data-event-page').extract()
+        base_url = 'https://www.marathonbet.ru/su/betting/'
+        links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_match)
             request.meta['proxy'] = 'http://127.0.0.1:8118'
