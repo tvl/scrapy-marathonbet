@@ -7,7 +7,7 @@ from datetime import date, datetime, timezone, timedelta
 
 class LineSpider(Spider):
     name = "line"
-    allowed_domains = ['marathonbet.ru']
+    allowed_domains = ['marathonbet.ru', 'marathonbet.com']
     today  = date.today()
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
