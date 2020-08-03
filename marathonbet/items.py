@@ -18,3 +18,8 @@ class Match(Item):
     id = Field()
     data = Field()
     updated = Field()
+
+class Competition(Item):
+    id = Field()
+    link = Field()
+    updated = Field()

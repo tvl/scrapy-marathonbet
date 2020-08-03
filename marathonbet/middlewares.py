@@ -6,7 +6,8 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-
+from stem import Signal
+from stem.control import Controller
 
 class MarathonbetSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -19,6 +20,7 @@ class MarathonbetSpiderMiddleware(object):
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
+
 
     def process_spider_input(self, response, spider):
         # Called for each response that goes through the spider
@@ -68,6 +70,12 @@ class MarathonbetDownloaderMiddleware(object):
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
 
+    def change_tor_ip(self):
+        with Controller.from_port(port=9051) as controller:
+            controller.authenticate(password=self.settings.get('KjujgtlbcN'))
+            controller.signal(Signal.NEWNYM)
+            controller.close()
+
     def process_request(self, request, spider):
         # Called for each request that goes through the downloader
         # middleware.
@@ -87,7 +95,13 @@ class MarathonbetDownloaderMiddleware(object):
         # - return a Response object
         # - return a Request object
         # - or raise IgnoreRequest
-        return response
+        #return response
+        if response.status in [403, 451]:
+            self.change_tor_ip()
+            spider.logger.info('Change ip of tor exitnode')
+            return request
+        else:
+            return response
 
     def process_exception(self, request, exception, spider):
         # Called when a download handler or a process_request()
