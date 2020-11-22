@@ -8,6 +8,23 @@
 from scrapy import signals
 from stem import Signal
 from stem.control import Controller
+import os
+import random
+
+
+class RandomUserAgentMiddleware(object):
+    @classmethod
+    def process_request(self, request, spider):
+        settings = spider.settings
+        ua  = random.choice(settings.get('USER_AGENT_LIST'))
+        if ua:
+            request.headers.setdefault('User-Agent', ua)
+
+class ProxyMiddleware(object):
+    @classmethod
+    def process_request(self, request, spider):
+        settings = spider.settings
+        request.meta['proxy'] = settings.get('HTTP_PROXY')
 
 class MarathonbetSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,

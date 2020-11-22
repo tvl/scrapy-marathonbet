@@ -33,7 +33,7 @@ class LineSpider(Spider):
         #self.logger.info('Tor version: {}', self.controller.get_version())
         for u in self.start_urls:
             request = Request(url=u, callback=self.parse_index)
-            request.meta['proxy'] = 'http://127.0.0.1:8118'
+            #request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
     """
     def start_requests(self):
@@ -59,7 +59,7 @@ class LineSpider(Spider):
             links = [link for link in links if '/Football/' in link]
             for l in links:
                 request = Request(url=base_url+l, callback=self.parse_competition)
-                request.meta['proxy'] = 'http://127.0.0.1:8118'
+                #request.meta['proxy'] = 'http://127.0.0.1:8118'
                 yield request
 
     def parse_competition(self, response):
@@ -73,7 +73,7 @@ class LineSpider(Spider):
             links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
             for l in links:
                 request = Request(url=base_url+l, callback=self.parse_match)
-                request.meta['proxy'] = 'http://127.0.0.1:8118'
+                #request.meta['proxy'] = 'http://127.0.0.1:8118'
                 yield request
 
     def parse_match(self, response):
