@@ -17,24 +17,21 @@ class LineSpider(Spider):
     start_urls = [
             'https://www.marathonbet.ru/su/?cpcids=all'
         ]
-    handle_httpstatus_list = [403, 451]
-    controller = None
 
-    def change_tor_ip(self):
-        if self.controller.is_newnym_available():
-            self.logger.info('Tor change ip of exitnode')
-            self.controller.signal(Signal.NEWNYM)
-        else:
-            self.logger.info('Tor wait for {}s'.format(self.controller.get_newnym_wait()))
 
     def start_requests(self):
-        self.controller = Controller.from_port(port=9051)
-        self.controller.authenticate(password="KjujgtlbcN")
-        #self.logger.info('Tor version: {}', self.controller.get_version())
+        start_url = 'https://www.marathonbet.ru/su/popular/Football+-+11?interval=ALL_TIME'
+        request = Request(url=start_url, callback=self.parse_competition)
+        yield request
+
+    """
+    def start_requests(self):
         for u in self.start_urls:
             request = Request(url=u, callback=self.parse_index)
             #request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
+    """
+
     """
     def start_requests(self):
         base_url = 'https://www.marathonbet.ru/su/betting/'
@@ -47,46 +44,27 @@ class LineSpider(Spider):
     """
 
     def parse_index(self, response):
-        if response.status in [403, 451]:
-            self.change_tor_ip()
-            self.logger.info('Sleep for 5s')
-            sleep(5)
-            yield Request(url=response.url, callback=self.parse_index)
-        else:
-            base_url = 'https://www.marathonbet.ru'
-            #links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
-            links = response.xpath('//div[@class="hidden-links"]//@href').extract()
-            links = [link for link in links if '/Football/' in link]
-            for l in links:
-                request = Request(url=base_url+l, callback=self.parse_competition)
-                #request.meta['proxy'] = 'http://127.0.0.1:8118'
-                yield request
+        base_url = 'https://www.marathonbet.ru'
+        #links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
+        links = response.xpath('//div[@class="hidden-links"]//@href').extract()
+        links = [link for link in links if '/Football/' in link]
+        for l in links:
+            request = Request(url=base_url+l, callback=self.parse_competition)
+            #request.meta['proxy'] = 'http://127.0.0.1:8118'
+            yield request
 
     def parse_competition(self, response):
-        if response.status in [403, 451]:
-            self.change_tor_ip()
-            self.logger.info('Sleep for 5s')
-            sleep(5)
-            yield Request(url=response.url, callback=self.parse_competition)
-        else:
-            base_url = 'https://www.marathonbet.ru/su/betting/'
-            links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
-            for l in links:
-                request = Request(url=base_url+l, callback=self.parse_match)
-                #request.meta['proxy'] = 'http://127.0.0.1:8118'
-                yield request
+        base_url = 'https://www.marathonbet.ru/su/betting/'
+        links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
+        for l in links:
+            request = Request(url=base_url+l, callback=self.parse_match)
+            yield request
 
     def parse_match(self, response):
-        if response.status in [403, 451]:
-            self.change_tor_ip()
-            self.logger.info('Sleep for 5s')
-            sleep(5)
-            yield Request(url=response.url, callback=self.parse_match)
-        else:
-            lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
-            for l in lines:
-                item = Match()
-                item['id'] = response.xpath('//div[@class="bg coupon-row"]//@data-event-treeid').extract_first()
-                item['data'] = l
-                item['updated'] = datetime.utcnow().isoformat(' ')
-                yield item
+        lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
+        for l in lines:
+            item = Match()
+            item['id'] = response.xpath('//div[@class="bg coupon-row"]//@data-event-treeid').extract_first()
+            item['data'] = l
+            item['updated'] = datetime.utcnow().isoformat(' ')
+            yield item

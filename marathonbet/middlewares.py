@@ -10,7 +10,7 @@ from stem import Signal
 from stem.control import Controller
 import os
 import random
-
+from time import sleep, time
 
 class RandomUserAgentMiddleware(object):
     @classmethod
@@ -80,18 +80,26 @@ class MarathonbetDownloaderMiddleware(object):
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
 
+    controller = None
+    def new_tor_identity(self, spider):
+        if self.controller.is_newnym_available():
+            spider.logger.info('Tor change ip of exitnode')
+            self.controller.signal(Signal.NEWNYM)
+        else:
+            spider.logger.info('Tor wait for {}s'.format(self.controller.get_newnym_wait()))
+
+    def tor_relay_info(self):
+        circ = self.controller.get_circuit(event.circ_id)
+        exit_fingerprint = circ.path[-1][0]
+        exit_relay = self.controller.get_network_status(exit_fingerprint)
+        spider.logger.info('Tor exit relay: {}, {[]}'.format(exit_relay.address, controller.get_info("ip-to-country/%s" % exit_relay.address, 'unknown')))
+
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
         s = cls()
         crawler.signals.connect(s.spider_opened, signal=signals.spider_opened)
         return s
-
-    def change_tor_ip(self):
-        with Controller.from_port(port=9051) as controller:
-            controller.authenticate(password=self.settings.get('KjujgtlbcN'))
-            controller.signal(Signal.NEWNYM)
-            controller.close()
 
     def process_request(self, request, spider):
         # Called for each request that goes through the downloader
@@ -113,9 +121,11 @@ class MarathonbetDownloaderMiddleware(object):
         # - return a Request object
         # - or raise IgnoreRequest
         #return response
-        if response.status in [403, 451]:
-            self.change_tor_ip()
-            spider.logger.info('Change ip of tor exitnode')
+        if response.status != 200:
+            #self.tor_relay_info()
+            self.new_tor_identity(spider)
+            spider.logger.info('Sleep for 10s')
+            sleep(10)
             return request
         else:
             return response
@@ -132,3 +142,7 @@ class MarathonbetDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+        self.controller = Controller.from_port(port=9051)
+        self.controller.authenticate(password="KjujgtlbcN")
+        spider.logger.info('Tor version: {}'.format(self.controller.get_version()))
+
