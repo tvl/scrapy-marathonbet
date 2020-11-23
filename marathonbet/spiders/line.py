@@ -15,7 +15,7 @@ class LineSpider(Spider):
     today  = date.today()
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
-            'https://www.marathonbet.ru/su/'
+            'https://www.marathonbet.ru/su/?cpcids=all'
         ]
     handle_httpstatus_list = [403, 451]
     controller = None
