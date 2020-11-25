@@ -16,7 +16,7 @@ class LineSpider(Spider):
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
             'https://www.marathonbet.ru/su/?cpcids=all',
-            'https://www.marathonbet.ru/su/popular/Football+-+11?interval=ALL_TIME'
+            'https://www.marathonbet.ru/su/popular/Football+-+11?interval=H12'
         ]
 
     """
