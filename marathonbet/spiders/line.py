@@ -15,10 +15,11 @@ class LineSpider(Spider):
     today  = date.today()
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
-            'https://www.marathonbet.ru/su/?cpcids=all'
+            'https://www.marathonbet.ru/su/?cpcids=all',
+            'https://www.marathonbet.ru/su/popular/Football+-+11?interval=ALL_TIME'
         ]
 
-
+    """
     def start_requests(self):
         start_url = 'https://www.marathonbet.ru/su/popular/Football+-+11?interval=ALL_TIME'
         request = Request(url=start_url, callback=self.parse_competition)
@@ -26,11 +27,10 @@ class LineSpider(Spider):
 
     """
     def start_requests(self):
-        for u in self.start_urls:
-            request = Request(url=u, callback=self.parse_index)
-            #request.meta['proxy'] = 'http://127.0.0.1:8118'
-            yield request
-    """
+        request = Request(url=self.start_urls[0], callback=self.parse_index)
+        yield request
+        request = Request(url=self.start_urls[1], callback=self.parse_competition)
+        yield request
 
     """
     def start_requests(self):
@@ -50,7 +50,6 @@ class LineSpider(Spider):
         links = [link for link in links if '/Football/' in link]
         for l in links:
             request = Request(url=base_url+l, callback=self.parse_competition)
-            #request.meta['proxy'] = 'http://127.0.0.1:8118'
             yield request
 
     def parse_competition(self, response):
