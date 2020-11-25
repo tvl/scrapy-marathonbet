@@ -106,7 +106,7 @@ ROBOTSTXT_OBEY = False
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 #DOWNLOAD_DELAY = 3
-DOWNLOAD_DELAY = 12
+DOWNLOAD_DELAY = 9
 
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
@@ -135,7 +135,7 @@ COOKIES_ENABLED = False
 DOWNLOADER_MIDDLEWARES = {
 #    'marathonbet.middlewares.MarathonbetDownloaderMiddleware': 420,
     'marathonbet.middlewares.RandomUserAgentMiddleware': 400,
-#    'marathonbet.middlewares.ProxyMiddleware': 410,
+    'marathonbet.middlewares.ProxyMiddleware': 410,
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None
     # Disable compression middleware, so the actual HTML pages are cached
 }
@@ -156,7 +156,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 12
+AUTOTHROTTLE_START_DELAY = 9
 # The maximum download delay to be set in case of high latencies
 AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
