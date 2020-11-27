@@ -47,9 +47,11 @@ class LineSpider(Spider):
         base_url = 'https://www.marathonbet.ru'
         #links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
         links = response.xpath('//div[@class="hidden-links"]//@href').extract()
-        links = [link for link in links if '/Football/' in link]
+        links = [link for link in links if link.count('/') == 4]
+        links = [link for link in links if ('/Football/' in link) and (not 'Women' in link)]
+        self.logger.info('Links count: {}'.format(len(links)))
         for l in links:
-            request = Request(url=base_url+l, callback=self.parse_competition)
+            request = Request(url=base_url+l+'?interval=H12', callback=self.parse_competition)
             yield request
 
     def parse_competition(self, response):
