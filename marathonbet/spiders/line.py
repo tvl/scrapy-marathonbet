@@ -16,7 +16,7 @@ class LineSpider(Spider):
     tomorrow  = date.today()+timedelta(days=1)
     start_urls = [
             #'https://www.marathonbet.ru/su/?cpcids=all',
-            'https://www.marathonbet.ru/su/popular/Football+-+11'
+            'https://www.marathonbet.com/su/popular/Football+-+11'
         ]
 
     """
@@ -44,7 +44,7 @@ class LineSpider(Spider):
     """
 
     def parse_index(self, response):
-        base_url = 'https://www.marathonbet.ru'
+        base_url = 'https://www.marathonbet.com'
         #links = response.xpath('//div[@id="leftMenuLinks"]/a/@href').extract()
         links = response.xpath('//div[@class="hidden-links"]//@href').extract()
         links = [link for link in links if link.count('/') == 4]
@@ -55,7 +55,7 @@ class LineSpider(Spider):
             yield request
 
     def parse_competition(self, response):
-        base_url = 'https://www.marathonbet.ru/su/betting/'
+        base_url = 'https://www.marathonbet.com/su/betting/'
         links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
         links = [link for link in links if (not 'U-19' in link) and (not 'U-20' in link) and (not 'U-23' in link) \
                  and (not 'Spain/Tercera' in link) and (not 'England/National' in link) and (not 'Serie+D' in link)]
