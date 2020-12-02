@@ -59,7 +59,7 @@ class LineSpider(Spider):
         base_url = 'https://www.marathonbet.com/su/betting/'
         events = response.xpath('//span[@class="event-more-view"]/text()').extract()
         links = response.xpath('//div[@class="bg coupon-row"]/@data-event-path').extract()
-        links = [link for link in links if (not 'U-19' in link) and (not 'U-20' in link) and (not 'U-20' in link) and (not 'U-23' in link) \
+        links = [link for link in links if (not 'U-19' in link) and (not 'U-20' in link) and (not 'U-21' in link) and (not 'U-23' in link) \
                  and (not 'Spain/Tercera' in link) and (not 'England/National' in link) and (not 'Serie+D' in link)]
         for l, e in zip(links, events):
             if int(e) > 80:
