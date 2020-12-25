@@ -69,6 +69,8 @@ class LineSpider(Spider):
                 self.logger.info('Skip: {}'.format(base_url+l))
 
     def parse_match(self, response):
+        #response.xpath('//h1[contains(@class,"category-label")]/span/text()').extract()
+        #response.xpath('//td[starts-with(@class,"date")]/text()').extract_first().strip()
         lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
         for l in lines:
             item = Match()
