@@ -51,6 +51,8 @@ class LineSpider(Spider):
         links = [link for link in links if link.count('/') == 4]
         links = [link for link in links if (not 'Women' in link) and (not 'Outright' in link)]
         self.logger.info('Links count: {}'.format(len(links)))
+        # For schedule
+        self.logger.info('Matches data<<<id, datetime, area, competition, home_team, away_team, home, draw, away, odds, updated')
         for l in links:
             request = Request(url=base_url+l+'?interval=H24', callback=self.parse_competition)
             yield request
@@ -69,12 +71,43 @@ class LineSpider(Spider):
                 self.logger.info('Skip: {}'.format(base_url+l))
 
     def parse_match(self, response):
-        #response.xpath('//h1[contains(@class,"category-label")]/span/text()').extract()
-        #response.xpath('//td[starts-with(@class,"date")]/text()').extract_first().strip()
+        # For schedule
+        monthes = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+
+        match_id = response.xpath('//div[@class="bg coupon-row"]//@data-event-treeid').extract_first()
+        dates_list = response.xpath('//td[contains(@class,"date")]/text()').extract()
+        if len(dates_list) < 4:
+            date_time = dates_list[0].strip()
+        else:
+            date_time = dates_list[2].strip()
+        date_time = response.xpath('//td[contains(@class,"date")]/text()').extract()[0].strip()
+        dt = datetime.now()
+        if len(date_time) == 17: # 27 дек 2021 12:00
+            d, month, y, hh_mm = date_time.split(' ')
+            m = monthes.index(month.capitalize()) + 1
+            hh, mm  = hh_mm.split(':')
+            date_time = dt.replace(day = int(d), month = m, year = int(y), hour = int(hh), minute = int(mm), second = 0).isoformat(' ', timespec='seconds')
+        elif len(date_time) == 12: # 28 фев 10:00
+            d, month, hh_mm = date_time.split(' ')
+            m = monthes.index(month.capitalize()) + 1
+            hh, mm  = hh_mm.split(':')
+            date_time = dt.replace(day = int(d), month = m, hour = int(hh), minute = int(mm), second = 0).isoformat(' ', timespec='seconds')
+        elif len(date_time) == 5: # 23:00
+            hh, mm = date_time.split(':')
+            date_time = dt.replace(hour = int(hh), minute = int(mm), second = 0).isoformat(' ', timespec='seconds')
+        home_team, away_team = response.xpath('//a[contains(@class,"member-link")]//span/text()').extract()
+        #home_team, away_team = response.xpath('//div[@class="bg coupon-row"]//@data-event-name').extract_first().split(' - ')
+        area = response.xpath('//h1[contains(@class,"category-label")]/span/text()').extract()[0].strip('.')
+        competition = ' '.join(response.xpath('//h1[contains(@class,"category-label")]/span/text()').extract()[1:])
+        home, draw, away = response.xpath('//span[contains(@data-selection-key,"Match_Result")]/text()').extract()
+        odds = int(response.xpath('//span[contains(@class,"event-more-view")]/text()').extract_first())
+        updated = datetime.utcnow().isoformat(' ', timespec='seconds')
+        self.logger.info(f'Matches data<<<{match_id}, {date_time}, {area}, {competition}, {home_team}, {away_team}, {home}, {draw}, {away}, {odds}, {updated}')
+        # For odds
         lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
         for l in lines:
             item = Match()
             item['id'] = response.xpath('//div[@class="bg coupon-row"]//@data-event-treeid').extract_first()
             item['data'] = l
-            item['updated'] = datetime.utcnow().isoformat(' ')
+            item['updated'] = datetime.utcnow().isoformat(' ', timespec='seconds')
             yield item
