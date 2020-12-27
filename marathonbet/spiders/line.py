@@ -80,7 +80,7 @@ class LineSpider(Spider):
             date_time = dates_list[0].strip()
         else:
             date_time = dates_list[2].strip()
-        date_time = response.xpath('//td[contains(@class,"date")]/text()').extract()[0].strip()
+        #date_time = response.xpath('//td[contains(@class,"date")]/text()').extract()[0].strip()
         dt = datetime.now()
         if len(date_time) == 17: # 27 дек 2021 12:00
             d, month, y, hh_mm = date_time.split(' ')
