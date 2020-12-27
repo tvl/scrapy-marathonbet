@@ -52,7 +52,7 @@ class LineSpider(Spider):
         links = [link for link in links if (not 'Women' in link) and (not 'Outright' in link)]
         self.logger.info('Links count: {}'.format(len(links)))
         # For schedule
-        self.logger.info('Matches data<<<id, datetime, area, competition, home_team, away_team, home, draw, away, odds, updated')
+        self.logger.info('Matches data<<<id,datetime,area,competition,home_team,away_team,home,draw,away,odds,updated')
         for l in links:
             request = Request(url=base_url+l+'?interval=H24', callback=self.parse_competition)
             yield request
