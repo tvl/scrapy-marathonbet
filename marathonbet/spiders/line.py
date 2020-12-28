@@ -102,7 +102,7 @@ class LineSpider(Spider):
         home, draw, away = response.xpath('//span[contains(@data-selection-key,"Match_Result")]/text()').extract()
         odds = int(response.xpath('//span[contains(@class,"event-more-view")]/text()').extract_first())
         updated = datetime.utcnow().isoformat(' ', timespec='seconds')
-        self.logger.info(f'Matches data<<<{match_id}, {date_time}, {area}, {competition}, {home_team}, {away_team}, {home}, {draw}, {away}, {odds}, {updated}')
+        self.logger.info(f'Matches data<<<{match_id},{date_time},{area},{competition},{home_team},{away_team},{home},{draw},{away},{odds},{updated}')
         # For odds
         lines = response.xpath('//td[contains(@class,"height-column-with-price")]/@data-sel').extract()
         for l in lines:
